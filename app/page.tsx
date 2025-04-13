@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
@@ -38,8 +39,8 @@ const footRegions: FootRegion[] = [
       cause: "Insufficient push-off or neurological issue.",
       treatment: "Strengthen toe flexors or consult a podiatrist.",
     },
-    topPx: 40,
-    leftPx: 165,
+    topPx: 10,
+    leftPx: 70,
   },
   {
     name: "1st Metatarsal Head",
@@ -49,8 +50,8 @@ const footRegions: FootRegion[] = [
       cause: "Excessive forefoot loading.",
       treatment: "Use cushioned insoles or offloading techniques.",
     },
-    topPx: 130,
-    leftPx: 135,
+    topPx: 30,
+    leftPx: 70,
   },
   {
     name: "5th Metatarsal Head",
@@ -60,8 +61,8 @@ const footRegions: FootRegion[] = [
       cause: "Instability during lateral push-off.",
       treatment: "Wear stable footwear or try lateral strengthening.",
     },
-    topPx: 230,
-    leftPx: 160,
+    topPx: 35,
+    leftPx: 20,
   },
   {
     name: "Heel",
@@ -71,8 +72,8 @@ const footRegions: FootRegion[] = [
       cause: "Heel strike impact is low or shifted load.",
       treatment: "Check gait, consider cushioned heel inserts.",
     },
-    topPx: 370,
-    leftPx: 180,
+    topPx: 90,
+    leftPx: 50,
   },
 ];
 
@@ -84,6 +85,9 @@ const FootPressureAnalyzer: React.FC = () => {
   const [timer, setTimer] = useState<number>(30);
   const [dialogOpen, setDialogOpen] = useState(true);
   const [form, setForm] = useState({ name: "", height: "", weight: "" });
+  const [dynamicSuggestions, setDynamicSuggestions] = useState<{
+    [key: string]: string;
+  }>({});
 
   const [hoveredRegion, setHoveredRegion] = useState<{
     name: string;
@@ -164,6 +168,45 @@ const FootPressureAnalyzer: React.FC = () => {
     return value >= min && value <= max;
   });
 
+  const fetchSuggestion = async (
+    regionName: string,
+    value: number,
+    bmiCategory: BMICategory,
+    range: [number, number]
+  ) => {
+    const res = await fetch("/api/getSuggestion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ regionName, value, bmiCategory, range }),
+    });
+    const data = await res.json();
+    return data.suggestion;
+  };
+
+  useEffect(() => {
+    if (timer === 0) {
+      const fetchAllSuggestions = async () => {
+        const newSuggestions: { [key: string]: string } = {};
+        for (const region of footRegions) {
+          const value = sensorData[region.key] ?? 0;
+          const [min, max] = region.ranges[bmiCategory];
+          const isNormal = value >= min && value <= max;
+          if (!isNormal) {
+            const suggestion = await fetchSuggestion(
+              region.name,
+              value,
+              bmiCategory,
+              [min, max]
+            );
+            newSuggestions[region.key] = suggestion;
+          }
+        }
+        setDynamicSuggestions(newSuggestions);
+      };
+      fetchAllSuggestions();
+    }
+  }, [timer]);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6 text-gray-900">
       {/* Dialog */}
@@ -206,11 +249,11 @@ const FootPressureAnalyzer: React.FC = () => {
 
       {!dialogOpen && (
         <>
-          <h2 className="text-2xl font-semibold mb-2">
+          <h2 className="text-2xl font-semibold text-blue-950 mb-2">
             Hi {form.name}! Here is your foot pressure analysis:
           </h2>
 
-          <div className="text-sm text-gray-600 mb-4">
+          <div className="text-lg font-bold text-black mb-4">
             Waiting for sensor readings... {timer > 0 ? `${timer}s` : "Done!"}
           </div>
 
@@ -241,7 +284,7 @@ const FootPressureAnalyzer: React.FC = () => {
                   className={`absolute w-6 h-6 rounded-full border-2 cursor-pointer z-10 ${
                     isNormal ? "bg-green-500" : "bg-red-500"
                   }`}
-                  style={{ top: `${top}px`, left: `${left}px` }}
+                  style={{ top: `${top}%`, left: `${left}%` }}
                   onMouseEnter={() =>
                     setHoveredRegion({ name: region.name, value, top, left })
                   }
@@ -253,8 +296,8 @@ const FootPressureAnalyzer: React.FC = () => {
               <div
                 className="absolute bg-white text-black text-sm px-3 py-2 rounded-lg shadow-lg z-20"
                 style={{
-                  top: `${hoveredRegion.top - 5}px`,
-                  left: `${hoveredRegion.left + 5}px`,
+                  top: `${hoveredRegion.top - 2}%`,
+                  left: `${hoveredRegion.left + 5}%`,
                   transform: "translate(-50%, -100%)",
                 }}
               >
@@ -282,7 +325,7 @@ const FootPressureAnalyzer: React.FC = () => {
                       className="bg-white p-4 rounded-xl shadow"
                     >
                       <div className="flex justify-between items-center mb-1">
-                        <p className="font-semibold">{region.name}</p>
+                        <p className="font-bold text-xl">{region.name}</p>
                         <div
                           className={`w-4 h-4 rounded-full ${
                             isNormal ? "bg-green-500" : "bg-red-500"
@@ -294,8 +337,35 @@ const FootPressureAnalyzer: React.FC = () => {
                       </p>
                       {!isNormal && (
                         <div className="text-sm text-red-500 mt-1">
-                          <p>Cause: {region.suggestion.cause}</p>
-                          <p>Treatment: {region.suggestion.treatment}</p>
+                          {dynamicSuggestions[region.key] ? (
+                            <>
+                              {dynamicSuggestions[region.key]
+                                .split("\n")
+                                .map((line, idx) => {
+                                  // Check if the line starts with "Cause:" or "Treatment:"
+                                  if (
+                                    line.startsWith("Cause:") ||
+                                    line.startsWith("Treatment:")
+                                  ) {
+                                    return (
+                                      <p key={idx}>
+                                        <strong className="text-lg text-black font-bold">
+                                          {line.split(":")[0]}:
+                                        </strong>{" "}
+                                        {line.split(":")[1]}
+                                      </p>
+                                    );
+                                  }
+                                  return (
+                                    <p key={idx} className="font-sans">
+                                      {line}
+                                    </p>
+                                  );
+                                })}
+                            </>
+                          ) : (
+                            <p>Loading suggestion...</p>
+                          )}
                         </div>
                       )}
                     </div>
@@ -304,6 +374,14 @@ const FootPressureAnalyzer: React.FC = () => {
               )}
             </div>
           )}
+          <div className="flex justify-center mt-10">
+            <button
+              onClick={() => window.location.reload()}
+              className="cursor-pointer px-6 py-3 bg-blue-900 font-bold text-white rounded-xl hover:bg-blue-700 transition duration-200"
+            >
+              Want to take another pressure test?
+            </button>
+          </div>
         </>
       )}
     </div>
