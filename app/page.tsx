@@ -45,7 +45,7 @@ const footRegions: FootRegion[] = [
   {
     name: "1st Metatarsal Head",
     key: "firstMetatarsal",
-    ranges: { Normal: [250, 350], Overweight: [300, 400], Obese: [350, 450] },
+    ranges: { Normal: [200, 350], Overweight: [300, 400], Obese: [350, 450] },
     suggestion: {
       cause: "Excessive forefoot loading.",
       treatment: "Use cushioned insoles or offloading techniques.",
