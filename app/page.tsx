@@ -249,8 +249,21 @@ const FootPressureAnalyzer: React.FC = () => {
 
       {!dialogOpen && (
         <>
-          <h2 className="text-2xl font-semibold text-blue-950 mb-2">
+          <h1 className="text-3xl font-bold text-blue-950 mb-2">
             Hi {form.name}! Here is your foot pressure analysis:
+          </h1>
+          <h3 className="text-xl font-semibold text-blue-950 mb-2">
+            Your Height: {form.height}
+          </h3>
+          <h2 className="text-xl font-semibold text-blue-950 mb-2">
+            Your Weight: {form.weight}
+          </h2>
+          <h2 className="text-xl font-semibold text-blue-950 mb-2">
+            Your BMI: {bmi.toFixed(1)}
+          </h2>
+
+          <h2 className="text-xl font-semibold text-blue-950 mb-2">
+            Your BMI Category: {bmiCategory}
           </h2>
 
           <div className="text-lg font-bold text-black mb-4">

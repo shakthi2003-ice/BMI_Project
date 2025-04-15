@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   const { regionName, value, bmiCategory, range } = body;
 
   const prompt = `
-You are a medical assistant specializing in foot pressure analysis.
+You are a medical assistant specializing in foot pressure analysis with respect to DIABETIC ULCER.
 
 Given the following:
 - Region: ${regionName}
@@ -15,8 +15,8 @@ Given the following:
 
 The measured pressure is outside the normal range. 
 Provide:
-1. A possible **cause** of the abnormal pressure in sentence format (no bullet points).
-2. A recommended **treatment or suggestion** to address the issue, also in sentence format (no bullet points).
+1. A possible **cause** of the abnormal pressure in sentence format with respect to diabetic ulcer (no bullet points).
+2. A recommended **treatment or suggestion** to address the issue, also in sentence format with respect to diabetic ulcer (no bullet points).
 
 Format your response exactly like this:
 Cause: <your cause here>
