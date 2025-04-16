@@ -34,7 +34,7 @@ const footRegions: FootRegion[] = [
   {
     name: "Great Toe",
     key: "greatToe",
-    ranges: { Normal: [200, 300], Overweight: [250, 350], Obese: [300, 400] },
+    ranges: { Normal: [200, 300], Overweight: [200, 350], Obese: [300, 400] },
     suggestion: {
       cause: "Insufficient push-off or neurological issue.",
       treatment: "Strengthen toe flexors or consult a podiatrist.",
@@ -56,7 +56,7 @@ const footRegions: FootRegion[] = [
   {
     name: "5th Metatarsal Head",
     key: "fifthMetatarsal",
-    ranges: { Normal: [150, 250], Overweight: [200, 300], Obese: [250, 350] },
+    ranges: { Normal: [150, 300], Overweight: [300, 500], Obese: [250, 350] },
     suggestion: {
       cause: "Instability during lateral push-off.",
       treatment: "Wear stable footwear or try lateral strengthening.",
@@ -67,7 +67,7 @@ const footRegions: FootRegion[] = [
   {
     name: "Heel",
     key: "heel",
-    ranges: { Normal: [300, 400], Overweight: [350, 450], Obese: [400, 500] },
+    ranges: { Normal: [300, 400], Overweight: [300, 500], Obese: [400, 500] },
     suggestion: {
       cause: "Heel strike impact is low or shifted load.",
       treatment: "Check gait, consider cushioned heel inserts.",
